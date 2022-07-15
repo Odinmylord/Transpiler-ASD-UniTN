@@ -1,3 +1,6 @@
+from collections import deque
+
+
 class ListOneBased(list):
     def __init__(self, *args):
         list.__init__(self, *args)
@@ -94,3 +97,42 @@ class Tree:
 
     def __str__(self):
         return self.value
+
+
+class Stack:
+
+    def __init__(self):
+        self.items = []
+
+    def push(self, item):
+        self.items.append(item)
+
+    def pop(self):
+        return self.items.pop()
+
+    def top(self):
+        assert len(self.items) > 0
+        return self.items[-1]
+
+    def isEmpty(self) -> bool:
+        return not self
+
+    def size(self):
+        return len(self.items)
+
+
+class Queue(deque):
+    def __init__(self, **kwargs):
+        super().__init__(kwargs)
+        self.enqueue = self.append
+        self.dequeue = self.popleft
+
+    def top(self):
+        assert len(self) > 0
+        return self[0]
+
+    def isEmpty(self) -> bool:
+        return not self
+
+    def size(self):
+        return len(self)

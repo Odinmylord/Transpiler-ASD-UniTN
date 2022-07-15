@@ -13,7 +13,9 @@ STRUCTS_LIST = {
     "Set": "set",
     "Graph": "GraphDict",
     "Node": "int",
-    "Tree": "Tree"
+    "Tree": "Tree",
+    "Queue": "Queue",
+    "Stack": "Stack"
 }
 
 TAB_SPACES = 4
@@ -33,7 +35,10 @@ MAPPING = {
     " do": ":",
     "nil": "None",
     "false": "False",
-    "true": "True"
+    "true": "True",
+    "〈": "(",
+    "〉": ")",
+    " % ": "# "  # Sicuramente darà problemi ma serve per i commenti
 }
 REGEXES = {
     "\)(?=\d+)": ")**",
@@ -41,6 +46,7 @@ REGEXES = {
     "(?<=[^b\(])c(?=\))": ")",
     "d(?=\()(?=[^\)e])": "math.ceil(",
     "(?<=[^d\(])e(?=\))": ")",
+
 }
 
 
@@ -110,7 +116,7 @@ def is_declaration(line: str) -> bool:
         return return_value
 
     tokens = line.split(" ")
-    if tokens[0] in TYPES_LIST or (tokens[0][-1] == "[" and tokens[0][:-1] in TYPES_LIST):
+    if tokens[0] in TYPES_LIST or tokens[0] in STRUCTS_LIST or (tokens[0][-1] == "[" and tokens[0][:-1] in TYPES_LIST):
         return_value = True
     return return_value
 
@@ -214,6 +220,14 @@ def inline_if_translator(line: str) -> str:
     return line
 
 
+def for_translator(line: str):
+    tokens = line.split(" ")
+    var_name = tokens[1]
+    base = tokens[3]
+    limit = tokens[5].strip(":")
+    return f"for {var_name} in range({base}, {limit}+1):"
+
+
 def remap(line: str, regex=False) -> str:
     """
     :param regex: if true regexes are used to convert
@@ -230,6 +244,11 @@ def remap(line: str, regex=False) -> str:
             line = re.sub(regex, REGEXES[regex], line)
     if "iif" in line:
         line = inline_if_translator(line)
+    if line.startswith("for"):
+        line = for_translator(line)
+    if line.startswith("print"):
+        line = line.replace("print", "print(")
+        line += ")"
     return left_offset + line
 
 
