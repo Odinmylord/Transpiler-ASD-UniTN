@@ -38,15 +38,10 @@ MAPPING = {
     "true": "True",
     "〈": "(",
     "〉": ")",
-    " % ": "# "  # Sicuramente darà problemi ma serve per i commenti
+    " % ": "#  "  # Sicuramente darà problemi ma serve per i commenti
 }
 REGEXES = {
     "\)(?=\d+)": ")**",
-    "b(?=\()(?=[^\)c])": "math.floor(",
-    "(?<=[^b\(])c(?=\))": ")",
-    "d(?=\()(?=[^\)e])": "math.ceil(",
-    "(?<=[^d\(])e(?=\))": ")",
-
 }
 
 
@@ -160,9 +155,9 @@ def var_declaration(line: str) -> str:
         var = left_offset + var_name + " =" + f" functions.{function_module}." + tokens[-1].strip()
 
     elif tokens[0][-1] == "[" and "new" in line and not default_value:
-        # TODO mettere controlli su dict e simili e matrici
-        struct_decl = tokens[-1]
-        initialization_size = struct_decl[struct_decl.index("[") + 1:struct_decl.index("]")]
+        new_pos = tokens.index("new")
+        struct_decl = "".join(tokens[new_pos + 1:])  # prende la parte finale dove si trova la dimensione
+        initialization_size = struct_decl[struct_decl.index("[") + 1:struct_decl.index("]")].replace("...", ", ")
         var_type = "ListOneBased()"
         if initialization_size:
             var_type = f"ListOneBased([\"__\" for _ in range({initialization_size})])"
@@ -236,15 +231,18 @@ def remap(line: str, regex=False) -> str:
     :return:
     """
     left_offset = left_offset_calculator(line)
+    original_line = line
     line = line.strip()
     for key in MAPPING:
         line = line.replace(key, MAPPING[key])
     if regex:
         for regex in REGEXES:
             line = re.sub(regex, REGEXES[regex], line)
+
     if "iif" in line:
         line = inline_if_translator(line)
-    if line.startswith("for"):
+    line = check_math_func(line)
+    if line.startswith("for") and "∈" not in original_line:
         line = for_translator(line)
     if line.startswith("print"):
         line = line.replace("print", "print(")
@@ -257,3 +255,9 @@ def left_offset_calculator(line: str) -> str:
     indent_spaces = len(line) - len(line.lstrip())
     left_offset = TAB_SPACES * INDENTATION_TYPE * indent_tab + " " * indent_spaces
     return left_offset
+
+
+def check_math_func(line: str) -> str:
+    #TODO fare qualcosa per math floor e ceiling
+    # rispettivamente b2/3c d2/3e
+    return line
