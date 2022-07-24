@@ -223,8 +223,9 @@ def for_translator(line: str):
     return f"for {var_name} in range({base}, {limit}+1):"
 
 
-def remap(line: str, regex=False) -> str:
+def remap(line: str, regex=False, skip_confirmation: bool = False) -> str:
     """
+    :param skip_confirmation: if true all confirmations for conversion of math functions are skipped
     :param regex: if true regexes are used to convert
     :param line: a line of pseudo-code
     :return: the line with the variables remapped
@@ -241,7 +242,8 @@ def remap(line: str, regex=False) -> str:
 
     if "iif" in line:
         line = inline_if_translator(line)
-    line = check_math_func(line)
+    if regex:  # Means that this isn't a func or variable declaration
+        line = check_math_func(line, skip_confirmation)
     if line.startswith("for") and "∈" not in original_line:
         line = for_translator(line)
     if line.startswith("print"):
@@ -257,7 +259,40 @@ def left_offset_calculator(line: str) -> str:
     return left_offset
 
 
-def check_math_func(line: str) -> str:
-    #TODO fare qualcosa per math floor e ceiling
-    # rispettivamente b2/3c d2/3e
+def check_math_func(line: str, skip_confirmation: bool) -> str:
+    start_indexes = {}
+    ending_indexes = {}
+    for i in range(len(line)):
+        char = line[i]
+        if char in ['b', 'd']:
+            start_indexes[i] = char
+        elif char in ['c', 'e']:
+            ending_indexes[i] = char
+    if start_indexes and ending_indexes and len(start_indexes) != len(ending_indexes):
+        print("Math functions conversion found an inconsistency between starting and ending values")
+    original_length = len(line)
+    offset = 0
+    for start, end in zip(start_indexes, ending_indexes):
+        start_pos = start + offset
+        end_pos = end + offset
+        substitute = False
+        if skip_confirmation:
+            substitute = True
+        else:
+            print_string = "Do you want to substitute this two characters with their respective math function?\n"+ \
+                           line+"\n"+" "*start_pos+"^"+" "*(end_pos-start_pos-1)+"^\n" + "Type Y or y to substitute: "
+            res = input(print_string)
+            if res.lower() == "y":
+                substitute = True
+        if substitute:
+            line = insert_value_in_string(line, ")", end_pos)
+            value = "math.floor("
+            if start_indexes[start] == "d":
+                value = "math.ceil("
+            line = insert_value_in_string(line, value, start_pos)
+            offset += len(line) - original_length
     return line
+
+
+def insert_value_in_string(string: str, value: str, index: int):
+    return string[:index] + value + string[index + 1:]

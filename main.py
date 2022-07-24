@@ -4,10 +4,16 @@ import utils
 
 
 def main():
-    if len(sys.argv) != 2:
+    skip_confirmation = False  # Confirmation to convert math.floor
+    files = [arg for arg in sys.argv if not arg.startswith("-")]
+    flags = set(sys.argv) - set(files)
+    flags = list(flags)
+    if len(files) != 2:
         print("Usage: python3 main.py <filename>")
         sys.exit(1)
-    filename = sys.argv[1]
+    if "-Y" in flags:
+        skip_confirmation = True
+    filename = files[1]
     with open(filename, "r") as f, open(filename + ".py", "w") as out:
         out.write("import math\n")
         out.write("from Classes import ListOneBased, GraphDict, Tree, Queue, Stack\n")
@@ -26,8 +32,8 @@ def main():
                 line = var
             else:
                 use_regex = True
-            line = utils.remap(line, use_regex)
-            out.write(line+"\n")
+            line = utils.remap(line, use_regex, skip_confirmation)
+            out.write(line + "\n")
 
 
 if __name__ == '__main__':
