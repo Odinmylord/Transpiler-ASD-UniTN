@@ -38,7 +38,7 @@ MAPPING = {
     "true": "True",
     "〈": "(",
     "〉": ")",
-    " % ": "#  "  # Sicuramente darà problemi ma serve per i commenti
+    " % ": "#  "  # It will surely give problems, but it is necessary for comments
 }
 REGEXES = {
     "\)(?=\d+)": ")**",  # This is a try to solve the problem of the power that can't be recognized
@@ -139,7 +139,6 @@ def var_declaration(line: str) -> str:
     """
     :param line: a line of pseudo-code
     :return: the variable declaration
-    :return:
     """
     left_offset = left_offset_calculator(line)
     line = line.strip()
@@ -169,15 +168,24 @@ def var_declaration(line: str) -> str:
 
 
 def array_declaration(struct_declaration: str, default_value: str = None):
+    """
+    Takes a list of sizes for arrays like [1...n][1...9][n] and returns the array that fits this description.
+    The three dots between the lower and upper bound are necessary.
+    :param struct_declaration: a string containing the sizes of the different arrays
+    :param default_value: the default value to initialize the arrays
+    :return: the declaration for the given array
+    """
     levels = []
     if default_value:
         struct_declaration = struct_declaration[:struct_declaration.index("=")]
-        print(struct_declaration)
     while "[" in struct_declaration:
         left_par_index = struct_declaration.index("]")
         right_par_index = struct_declaration.index("[")
         initialization_size = struct_declaration[right_par_index + 1:left_par_index]
         initialization_size = initialization_size.replace("...", ", ")
+        if "," in initialization_size and initialization_size[0] != "1":
+            # In cases like 2...n the first cell exists and is full so that it doesn't give problems
+            initialization_size = "1"+initialization_size[1:]
         levels.append(initialization_size)
         struct_declaration = struct_declaration[left_par_index + 1:]
     first_level = levels.pop(0)
