@@ -41,7 +41,7 @@ MAPPING = {
     " % ": "#  "  # Sicuramente darà problemi ma serve per i commenti
 }
 REGEXES = {
-    "\)(?=\d+)": ")**",
+    "\)(?=\d+)": ")**",  # This is a try to solve the problem of the power that can't be recognized
 }
 
 
@@ -154,40 +154,40 @@ def var_declaration(line: str) -> str:
         function_name, function_module = get_func_declaration(tokens[-1])
         var = left_offset + var_name + " =" + f" functions.{function_module}." + tokens[-1].strip()
 
-    elif tokens[0][-1] == "[" and "new" in line and not default_value:
+    elif "[" in name_part and "new" in line:
         new_pos = tokens.index("new")
-        struct_decl = "".join(tokens[new_pos + 1:])  # prende la parte finale dove si trova la dimensione
-        initialization_size = struct_decl[struct_decl.index("[") + 1:struct_decl.index("]")].replace("...", ", ")
-        var_type = "ListOneBased()"
-        if initialization_size:
-            var_type = f"ListOneBased([\"__\" for _ in range({initialization_size})])"
-
-        if line[:equal_index].count("[") == 2:
-            # TODO fixare parte matrici
-            var_type = f"ListOneBased({var_type})"
-        var = left_offset + var_name + " = " + var_type
-
-    elif default_value:
         # i due meno sembrano uguali ma non lo sono
-        default_value = default_value[1:] + "*-1" \
-            if (default_value[0] == "-" or default_value[0] == "−") \
-            else default_value
-        size_string = line[equal_index:].split("[")[1].split("]")[0]
-        point_index = size_string.index(".")
-        lower_bound = size_string[:point_index].strip()
-        size_string = size_string[point_index + 1:]
-        upper_bound = size_string.replace(".", "").strip()
-
-        var_type = "ListOneBased([" + "\"__\"," * (int(lower_bound) - 1) + "])"
-        var_content = f"[{default_value} for _ in range({lower_bound}, {upper_bound}+1)]"
-        var_values = var_type + "+" + var_content
-        if lower_bound == "1":
-            var_values = "ListOneBased(" + var_content + ")"
-        var = left_offset + var_name + " = " + var_values
+        if default_value and default_value[0] in ["−", "-"]:
+            default_value = default_value[1:] + "*-1"
+        struct_declaration = "".join(tokens[new_pos + 1:])  # prende la parte finale dove si trova la dimensione
+        var_type = array_declaration(struct_declaration, default_value)
+        var = left_offset + var_name + " = " + var_type
 
     else:
         var = left_offset + line[line.index(" ") + 1:]
     return var
+
+
+def array_declaration(struct_declaration: str, default_value: str = None):
+    levels = []
+    if default_value:
+        struct_declaration = struct_declaration[:struct_declaration.index("=")]
+        print(struct_declaration)
+    while "[" in struct_declaration:
+        left_par_index = struct_declaration.index("]")
+        right_par_index = struct_declaration.index("[")
+        initialization_size = struct_declaration[right_par_index + 1:left_par_index]
+        initialization_size = initialization_size.replace("...", ", ")
+        levels.append(initialization_size)
+        struct_declaration = struct_declaration[left_par_index + 1:]
+    first_level = levels.pop(0)
+    base = f"ListOneBased([\"__\" for _ in range({first_level}+1)])"
+    for level in levels:
+        array = f"ListOneBased([\"__\" for _ in range({level}+1)])"
+        base = base.replace("\"__\"", array)
+    if default_value:
+        base = base.replace("\"__\"", default_value)
+    return base
 
 
 def inline_if_translator(line: str) -> str:
@@ -279,8 +279,9 @@ def check_math_func(line: str, skip_confirmation: bool) -> str:
         if skip_confirmation:
             substitute = True
         else:
-            print_string = "Do you want to substitute this two characters with their respective math function?\n"+ \
-                           line+"\n"+" "*start_pos+"^"+" "*(end_pos-start_pos-1)+"^\n" + "Type Y or y to substitute: "
+            print_string = "Do you want to substitute this two characters with their respective math function?\n" + \
+                           line + "\n" + " " * start_pos + "^" + " " * (
+                                   end_pos - start_pos - 1) + "^\n" + "Type Y or y to substitute: "
             res = input(print_string)
             if res.lower() == "y":
                 substitute = True
