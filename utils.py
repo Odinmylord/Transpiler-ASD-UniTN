@@ -39,7 +39,7 @@ MAPPING = {
     "〈": "(",
     "〉": ")",
     " % ": "#  ",  # It will surely give problems, but it is necessary for comments
-    "mod": "%",
+    " mod ": "%",
 }
 REGEXES = {
     "\)(?=\d+)": ")**",  # This is a try to solve the problem of the power that can't be recognized
@@ -96,6 +96,7 @@ def build_function(name: str, params: dict) -> str:
             function_def += param + ": ListOneBased"
         function_def += ", "
     function_def = function_def[:-2] + "):\n"
+    function_def = function_def.replace("-", "_")
     return function_def
 
 
@@ -224,7 +225,6 @@ def inline_if_translator(line: str) -> str:
 
 def for_translator(line: str):
     tokens = line.split(" ")
-    print(tokens)
     var_name = tokens[1]
     base = tokens[3]
     limit = tokens[5].strip(":")
@@ -253,15 +253,21 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
     if not no_math and not line.startswith("def"):
         line = check_math_func(line, skip_confirmation)
     if line.startswith("for") and "∈" not in original_line:
-        print(line)
         line = for_translator(line)
     elif line.startswith("for"):
-        line = line.replace("{", "range(").replace("}","+1)")
+        line = line.replace("{", "range(").replace("}", "+1)")
     if line.startswith("print"):
         line = line.replace("print", "print(")
         line += ")"
     if "|" in line:
         line = abs_value(line)
+    if "sort" in line and not line.startswith("def"):
+        target = line[line.index("sort("):]
+        target = target[:target.index(")")]
+        line = line.replace("sort", "list.sort")
+        if "," in target:
+            new_target = target.split(",")[0]
+            line = line.replace(target, new_target)
     return left_offset + line
 
 
@@ -334,7 +340,7 @@ def abs_value(line: str) -> str:
     offset = 0
     for pos in values:
         value = "abs(" if values[pos] else ")"
-        line = insert_value_in_string(line, value, pos+offset)
+        line = insert_value_in_string(line, value, pos + offset)
         offset += len(line) - last_length
         last_length = len(line)
     return line
