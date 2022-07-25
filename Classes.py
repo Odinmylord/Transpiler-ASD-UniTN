@@ -25,11 +25,10 @@ class GraphDict:
 
     def __init__(self):
         self.nodes = {}
-        self.size = self.size
         # Aliases to stick to pseudo-code definitions
         self.insertNode = self.insert_node
         self.insertEdge = self.insert_edge
-        self.V = self.vertices()
+        self.V = self.vertices
 
     def size(self):
         return len(self.nodes)
