@@ -31,6 +31,7 @@ All the functions inside `known_functions` folder are translated from Alberto Mo
 
 - Move mapping and regex dict to a file so that is easier to edit for the user
 - Add more flags like -o
+- Add missing data structures
 
 Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
 
