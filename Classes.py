@@ -1,5 +1,8 @@
 from collections import deque
 
+"""The GraphDict and Tree implementations inside this file are translated from Alberto Montresor site https://cricca.disi.unitn.it/montresor/
+    the original work is available under license CC BY-SA 4.0"""
+
 
 class ListOneBased(list):
     def __init__(self, *args):
