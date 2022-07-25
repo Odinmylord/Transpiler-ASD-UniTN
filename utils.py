@@ -224,6 +224,7 @@ def inline_if_translator(line: str) -> str:
 
 def for_translator(line: str):
     tokens = line.split(" ")
+    print(tokens)
     var_name = tokens[1]
     base = tokens[3]
     limit = tokens[5].strip(":")
@@ -252,7 +253,10 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
     if not no_math and not line.startswith("def"):
         line = check_math_func(line, skip_confirmation)
     if line.startswith("for") and "∈" not in original_line:
+        print(line)
         line = for_translator(line)
+    elif line.startswith("for"):
+        line = line.replace("{", "range(").replace("}","+1)")
     if line.startswith("print"):
         line = line.replace("print", "print(")
         line += ")"
