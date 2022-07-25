@@ -21,6 +21,7 @@ A transpiler that translates pseudocode from Alberto Montresor book and slides i
 # Known Issues
 
 - Still didn't find a consistent way to check for power operator
+- Inconsistent recognition of math.floor and math.ceil functions
 
 # TODO
 

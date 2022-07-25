@@ -248,7 +248,7 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
 
     if "iif" in line:
         line = inline_if_translator(line)
-    if regex and not no_math:  # Means that this isn't a func or variable declaration
+    if not no_math and not line.startswith("def"):
         line = check_math_func(line, skip_confirmation)
     if line.startswith("for") and "∈" not in original_line:
         line = for_translator(line)
@@ -283,13 +283,15 @@ def check_math_func(line: str, skip_confirmation: bool) -> str:
             start_indexes[i] = char
         elif char in ['c', 'e']:
             ending_indexes[i] = char
-    if start_indexes and ending_indexes and len(start_indexes) != len(ending_indexes):
-        print("Math functions conversion found an inconsistency between starting and ending values")
     original_length = len(line)
     offset = 0
-    for start, end in zip(start_indexes, ending_indexes):
+    for start, end in zip(start_indexes, reversed(list(ending_indexes.keys()))):
         start_pos = start + offset
         end_pos = end + offset
+
+        if end_pos < start_pos:
+            continue
+
         substitute = False
         if skip_confirmation:
             substitute = True
