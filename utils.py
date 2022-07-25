@@ -8,7 +8,7 @@ KNOWN_FUNCTIONS = GRAPHS_FUNCTIONS
 FUNCTIONS_MAPPER = {
     "graphs": GRAPHS_FUNCTIONS
 }
-TYPES_LIST = ["int", "float", "bool", "string"]
+TYPES_LIST = ["int", "float", "bool", "string", "boolean"]
 STRUCTS_LIST = {
     "Set": "set",
     "Graph": "GraphDict",
@@ -40,6 +40,8 @@ MAPPING = {
     "〉": ")",
     " % ": "#  ",  # It will surely give problems, but it is necessary for comments
     " mod ": "%",
+    "boolean": "bool",
+    "null": "None"
 }
 REGEXES = {
     "\)(?=\d+)": ")**",  # This is a try to solve the problem of the power that can't be recognized
@@ -255,7 +257,13 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
     if line.startswith("for") and "∈" not in original_line:
         line = for_translator(line)
     elif line.startswith("for"):
-        line = line.replace("{", "range(").replace("}", "+1)")
+        if "- {" in line:
+            lists = line[line.index("in") + 2:line.index(":")]
+            new_lists = lists.replace("{", "[").replace("}", "]").replace("-", ",")
+            new_lists = " functions.useful_functions.subtract_lists(" + new_lists + ")"
+            line = line.replace(lists, new_lists)
+        else:
+            line = line.replace("{", "range(").replace("}", "+1)")
     if line.startswith("print"):
         line = line.replace("print", "print(")
         line += ")"

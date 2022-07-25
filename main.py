@@ -21,7 +21,7 @@ def main():
     with open(filename, "r") as f, open(filename + ".py", "w") as out:
         out.write("import math\n")
         out.write("from Classes import ListOneBased, GraphDict, Tree, Queue, Stack\n")
-        out.write("import functions.graphs\n")
+        out.write("import functions.graphs, functions.useful_functions\n")
         for line in f:
             line = line.rstrip()
             use_regex = False
