@@ -296,6 +296,7 @@ def check_math_func(line: str, skip_confirmation: bool) -> str:
     :param skip_confirmation: if true doesn't prompt user when converting
     :return: the line with the known_functions replaced
     """
+
     start_indexes = {}
     ending_indexes = {}
     last_length = len(line)
