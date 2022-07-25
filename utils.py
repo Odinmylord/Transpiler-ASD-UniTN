@@ -1,7 +1,7 @@
 import re
 from typing import Tuple, List
 
-import functions.graphs as graphs
+import known_functions.graphs as graphs
 
 GRAPHS_FUNCTIONS = [func for func in dir(graphs) if not func.startswith("__")]
 KNOWN_FUNCTIONS = GRAPHS_FUNCTIONS
@@ -51,7 +51,7 @@ REGEXES = {
 def is_function(line: str) -> bool:
     """
     :param line: a line of pseudo-code
-    :return: True if the line is a functions, False otherwise
+    :return: True if the line is a known_functions, False otherwise
     :return:
     """
     return line[0].isalpha() and line.count("(") == 1 and line[-1] == ")"
@@ -60,7 +60,7 @@ def is_function(line: str) -> bool:
 def extract_function(line: str) -> Tuple[str, dict]:
     """
     :param line: a line of pseudo-code
-    :return: the functions name and params
+    :return: the known_functions name and params
     :return:
     """
     param_mapping = {}
@@ -83,9 +83,9 @@ def extract_function(line: str) -> Tuple[str, dict]:
 
 def build_function(name: str, params: dict) -> str:
     """
-    :param name: the functions name
-    :param params: the functions params
-    :return: the functions definition
+    :param name: the known_functions name
+    :param params: the known_functions params
+    :return: the known_functions definition
     """
     function_def = "def " + name + "("
     for param in params:
@@ -153,7 +153,7 @@ def var_declaration(line: str) -> str:
         default_value = line[line.index("{") + 1:line.index("}")]
     if is_known_function(tokens):
         function_name, function_module = get_func_declaration(tokens[-1])
-        var = left_offset + var_name + " =" + f" functions.{function_module}." + tokens[-1].strip()
+        var = left_offset + var_name + " =" + f" known_functions.{function_module}." + tokens[-1].strip()
 
     elif "[" in name_part and "new" in line:
         new_pos = tokens.index("new")
@@ -235,8 +235,8 @@ def for_translator(line: str):
 
 def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool = False) -> str:
     """
-    :param no_math: If true the script doesn't try to convert floor and ceil functions
-    :param skip_confirmation: if true all confirmations for conversion of math functions are skipped
+    :param no_math: If true the script doesn't try to convert floor and ceil known_functions
+    :param skip_confirmation: if true all confirmations for conversion of math known_functions are skipped
     :param regex: if true regexes are used to convert, it also means that the line isn't a function declaration
     :param line: a line of pseudo-code
     :return: the line with the variables remapped
@@ -260,7 +260,7 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
         if "- {" in line:
             lists = line[line.index("in") + 2:line.index(":")]
             new_lists = lists.replace("{", "[").replace("}", "]").replace("-", ",")
-            new_lists = " functions.useful_functions.subtract_lists(" + new_lists + ")"
+            new_lists = " new_functions.useful_functions.subtract_lists(" + new_lists + ")"
             line = line.replace(lists, new_lists)
         else:
             line = line.replace("{", "range(").replace("}", "+1)")
@@ -292,9 +292,9 @@ def left_offset_calculator(line: str) -> str:
 
 def check_math_func(line: str, skip_confirmation: bool) -> str:
     """
-    :param line: the line containing the functions
+    :param line: the line containing the known_functions
     :param skip_confirmation: if true doesn't prompt user when converting
-    :return: the line with the functions replaced
+    :return: the line with the known_functions replaced
     """
     start_indexes = {}
     ending_indexes = {}

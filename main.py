@@ -5,7 +5,7 @@ import utils
 
 def main():
     skip_confirmation = False  # Confirmation to convert math.floor or math.ceil
-    no_math = False  # If true the script doesn't try to convert floor and ceil functions
+    no_math = False  # If true the script doesn't try to convert floor and ceil known_functions
     files = [arg for arg in sys.argv if not arg.startswith("-")]
     flags = set(sys.argv) - set(files)
     flags = list(flags)
@@ -21,7 +21,7 @@ def main():
     with open(filename, "r") as f, open(filename + ".py", "w") as out:
         out.write("import math\n")
         out.write("from Classes import ListOneBased, GraphDict, Tree, Queue, Stack\n")
-        out.write("import functions.graphs, functions.useful_functions\n")
+        out.write("import known_functions.graphs, new_functions.useful_functions\n")
         for line in f:
             line = line.rstrip()
             use_regex = False

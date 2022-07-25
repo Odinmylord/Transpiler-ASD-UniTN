@@ -2,6 +2,10 @@
 
 A transpiler that translates pseudocode from Alberto Montresor book and slides in to python.
 
+# Credits:
+All the functions inside `known_functions` folder are translated from Alberto Montresor slides available at
+[his site](https://cricca.disi.unitn.it/montresor/). They are available under license [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
 # Usage
 
 - Copy the code from a pdf
