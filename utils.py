@@ -27,7 +27,6 @@ MAPPING = {
     "6 =": "!=",
     " ≤": "<=",
     " ≥": ">=",
-    "mod": "%",
     "·": "*",
     "−": "-",
     "∈": "in",
@@ -38,7 +37,8 @@ MAPPING = {
     "true": "True",
     "〈": "(",
     "〉": ")",
-    " % ": "#  "  # It will surely give problems, but it is necessary for comments
+    " % ": "#  ",  # It will surely give problems, but it is necessary for comments
+    "mod": "%",
 }
 REGEXES = {
     "\)(?=\d+)": ")**",  # This is a try to solve the problem of the power that can't be recognized
@@ -216,7 +216,7 @@ def inline_if_translator(line: str) -> str:
         condition = tokens[0][tokens[0].index("(") + 1:]
         failure = tokens[-1][:-1]
         success = ",".join(tokens[1:len(tokens) - 1])
-        new_iif = success + " if " + condition + " else " + failure
+        new_iif = "(" + success + " if " + condition + " else " + failure + ")"
         line = line.replace(iif_to_change, new_iif)
     return line
 
@@ -229,8 +229,9 @@ def for_translator(line: str):
     return f"for {var_name} in range({base}, {limit}+1):"
 
 
-def remap(line: str, regex=False, skip_confirmation: bool = False) -> str:
+def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool = False) -> str:
     """
+    :param no_math: If true the script doesn't try to convert floor and ceil functions
     :param skip_confirmation: if true all confirmations for conversion of math functions are skipped
     :param regex: if true regexes are used to convert, it also means that the line isn't a function declaration
     :param line: a line of pseudo-code
@@ -247,7 +248,7 @@ def remap(line: str, regex=False, skip_confirmation: bool = False) -> str:
 
     if "iif" in line:
         line = inline_if_translator(line)
-    if regex:  # Means that this isn't a func or variable declaration
+    if regex and not no_math:  # Means that this isn't a func or variable declaration
         line = check_math_func(line, skip_confirmation)
     if line.startswith("for") and "∈" not in original_line:
         line = for_translator(line)
