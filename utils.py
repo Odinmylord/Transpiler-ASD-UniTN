@@ -23,6 +23,7 @@ INDENTATION_TYPE = " "
 
 MAPPING = {
     " then": ":",
+    "else if": "elif",
     "else": "else:",
     "6 =": "!=",
     " ≤": "<=",
@@ -183,7 +184,7 @@ def array_declaration(struct_declaration: str, default_value: str = None):
         initialization_size = initialization_size.replace("...", ", ")
         if "," in initialization_size and initialization_size[0] != "1":
             # In cases like 2...n the first cell exists and is full so that it doesn't give problems
-            initialization_size = "1"+initialization_size[1:]
+            initialization_size = "1" + initialization_size[1:]
         levels.append(initialization_size)
         struct_declaration = struct_declaration[left_par_index + 1:]
     first_level = levels.pop(0)
@@ -255,6 +256,8 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
     if line.startswith("print"):
         line = line.replace("print", "print(")
         line += ")"
+    if "|" in line:
+        line = abs_value(line)
     return left_offset + line
 
 
@@ -277,15 +280,15 @@ def check_math_func(line: str, skip_confirmation: bool) -> str:
     """
     start_indexes = {}
     ending_indexes = {}
-    for i in range(len(line)):
+    last_length = len(line)
+    for i in range(last_length):
         char = line[i]
         if char in ['b', 'd']:
             start_indexes[i] = char
         elif char in ['c', 'e']:
             ending_indexes[i] = char
-    original_length = len(line)
     offset = 0
-    for start, end in zip(start_indexes, reversed(list(ending_indexes.keys()))):
+    for start, end in zip(start_indexes, ending_indexes):
         start_pos = start + offset
         end_pos = end + offset
 
@@ -308,7 +311,28 @@ def check_math_func(line: str, skip_confirmation: bool) -> str:
             if start_indexes[start] == "d":
                 value = "math.ceil("
             line = insert_value_in_string(line, value, start_pos)
-            offset += len(line) - original_length
+            offset += len(line) - last_length
+            last_length = len(line)
+
+    return line
+
+
+def abs_value(line: str) -> str:
+    last_length = len(line)
+    start = True
+    values = {}
+    for i in range(last_length):
+        c = line[i]
+        if c != "|":
+            continue
+        values[i] = start
+        start = not start
+    offset = 0
+    for pos in values:
+        value = "abs(" if values[pos] else ")"
+        line = insert_value_in_string(line, value, pos+offset)
+        offset += len(line) - last_length
+        last_length = len(line)
     return line
 
 
