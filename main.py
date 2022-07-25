@@ -4,7 +4,7 @@ import utils
 
 
 def main():
-    skip_confirmation = False  # Confirmation to convert math.floor
+    skip_confirmation = False  # Confirmation to convert math.floor or math.ceil
     files = [arg for arg in sys.argv if not arg.startswith("-")]
     flags = set(sys.argv) - set(files)
     flags = list(flags)

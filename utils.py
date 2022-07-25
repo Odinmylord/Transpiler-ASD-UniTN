@@ -83,7 +83,6 @@ def build_function(name: str, params: dict) -> str:
     :param name: the functions name
     :param params: the functions params
     :return: the functions definition
-    :return:
     """
     function_def = "def " + name + "("
     for param in params:
@@ -102,8 +101,7 @@ def build_function(name: str, params: dict) -> str:
 def is_declaration(line: str) -> bool:
     """
     :param line: a line of pseudo-code
-    :return: True if the line is a variable declaration, False otherwise
-    :return:
+    :return: True if the line is a variable declaration, False otherwise:
     """
     return_value = False
     line = line.strip()
@@ -155,10 +153,10 @@ def var_declaration(line: str) -> str:
 
     elif "[" in name_part and "new" in line:
         new_pos = tokens.index("new")
-        # i due meno sembrano uguali ma non lo sono
+        # The two minuses have different unicode values
         if default_value and default_value[0] in ["−", "-"]:
             default_value = default_value[1:] + "*-1"
-        struct_declaration = "".join(tokens[new_pos + 1:])  # prende la parte finale dove si trova la dimensione
+        struct_declaration = "".join(tokens[new_pos + 1:])  # in the final part of the string there are the sizes
         var_type = array_declaration(struct_declaration, default_value)
         var = left_offset + var_name + " = " + var_type
 
@@ -234,10 +232,9 @@ def for_translator(line: str):
 def remap(line: str, regex=False, skip_confirmation: bool = False) -> str:
     """
     :param skip_confirmation: if true all confirmations for conversion of math functions are skipped
-    :param regex: if true regexes are used to convert
+    :param regex: if true regexes are used to convert, it also means that the line isn't a function declaration
     :param line: a line of pseudo-code
     :return: the line with the variables remapped
-    :return:
     """
     left_offset = left_offset_calculator(line)
     original_line = line
@@ -261,6 +258,10 @@ def remap(line: str, regex=False, skip_confirmation: bool = False) -> str:
 
 
 def left_offset_calculator(line: str) -> str:
+    """
+    :param line: the line to calculate offset of
+    :return: a string that represents the indentation for the line
+    """
     indent_tab = line.count("\t")
     indent_spaces = len(line) - len(line.lstrip())
     left_offset = TAB_SPACES * INDENTATION_TYPE * indent_tab + " " * indent_spaces
@@ -268,6 +269,11 @@ def left_offset_calculator(line: str) -> str:
 
 
 def check_math_func(line: str, skip_confirmation: bool) -> str:
+    """
+    :param line: the line containing the functions
+    :param skip_confirmation: if true doesn't prompt user when converting
+    :return: the line with the functions replaced
+    """
     start_indexes = {}
     ending_indexes = {}
     for i in range(len(line)):
