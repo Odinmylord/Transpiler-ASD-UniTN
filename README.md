@@ -1,4 +1,4 @@
-# Transpiler-Montresor
+# Transpiler-ASD-UniTN
 
 A transpiler that translates pseudocode from Alberto Montresor book and slides in to python.
 
