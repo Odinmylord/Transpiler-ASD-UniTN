@@ -146,7 +146,7 @@ class MinPriorityQueue(list):
     """Implementation of the priority queue following Alberto Montresor slide methods.
         Note that the elements inside the queue are tuples of the type (priority, value)"""
 
-    def __init__(self, size):
+    def __init__(self, size=0):
         # Takes size only for a possible implementation of the priority queue with fixed size not yet available
         super().__init__()
         heapq.heapify(self)

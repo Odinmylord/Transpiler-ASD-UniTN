@@ -22,7 +22,7 @@ def main():
     filename = files[1]
     with open(filename, "r") as f, open(filename + ".py", "w") as out:
         out.write("import math\n")
-        out.write("from Classes import "+",".join(CLASSES)+"\n")
+        out.write("from Classes import "+", ".join(CLASSES)+"\n")
         out.write("import known_functions.graphs, new_functions.useful_functions\n")
         for line in f:
             line = line.rstrip()
