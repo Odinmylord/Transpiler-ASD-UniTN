@@ -1,6 +1,7 @@
 # Transpiler-ASD-UniTN
 
 A transpiler that translates pseudocode from Alberto Montresor book and slides in to python.
+It can also be used to translate the code from exams solutions.
 
 # Credits:
 All the functions inside `known_functions` folder, `GraphDict` class and `Tree` class are translated or taken from Alberto Montresor slides available at
