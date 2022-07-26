@@ -1,9 +1,11 @@
 import sys
 
+import Classes
 import utils
 
 
 def main():
+    CLASSES = [class_name for class_name in dir(Classes) if not class_name.startswith("__")]
     skip_confirmation = False  # Confirmation to convert math.floor or math.ceil
     no_math = False  # If true the script doesn't try to convert floor and ceil known_functions
     files = [arg for arg in sys.argv if not arg.startswith("-")]
@@ -20,7 +22,7 @@ def main():
     filename = files[1]
     with open(filename, "r") as f, open(filename + ".py", "w") as out:
         out.write("import math\n")
-        out.write("from Classes import ListOneBased, GraphDict, Tree, Queue, Stack\n")
+        out.write("from Classes import "+",".join(CLASSES)+"\n")
         out.write("import known_functions.graphs, new_functions.useful_functions\n")
         for line in f:
             line = line.rstrip()

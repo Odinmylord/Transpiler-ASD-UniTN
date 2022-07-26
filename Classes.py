@@ -1,4 +1,6 @@
+import heapq
 from collections import deque
+from typing import Tuple
 
 """The GraphDict and Tree implementations inside this file are translated from Alberto Montresor site https://cricca.disi.unitn.it/montresor/
     the original work is available under license CC BY-SA 4.0"""
@@ -24,7 +26,7 @@ class ListOneBased(list):
 
 
 class GraphDict:
-    """Implementation of a graph using a dictionary, taken from Alberto Montresor's slides"""
+    """Implementation of a graph using a dictionary, taken from Alberto Montresor slides"""
 
     def __init__(self):
         self.nodes = {}
@@ -138,3 +140,42 @@ class Queue(deque):
 
     def size(self):
         return len(self)
+
+
+class MinPriorityQueue(list):
+    """Implementation of the priority queue following Alberto Montresor slide methods.
+        Note that the elements inside the queue are tuples of the type (priority, value)"""
+
+    def __init__(self, size):
+        # Takes size only for a possible implementation of the priority queue with fixed size not yet available
+        super().__init__()
+        heapq.heapify(self)
+        self.deleteMin = self.delete_min
+        self.insert = self.priority_insert
+
+    def isEmpty(self) -> bool:
+        return not self
+
+    def min(self):
+        assert not self.isEmpty()
+
+        return heapq.nsmallest(1, self)
+
+    def delete_min(self):
+        assert not self.isEmpty()
+
+        return heapq.heappop(self)
+
+    def priority_insert(self, item: any, priority: int):
+        element = (priority, item)
+        heapq.heappush(self, element)
+        return element
+
+    def decrease(self, priority_item: Tuple[int, any], priority: int):
+        assert not self.isEmpty()
+        assert priority_item in self
+
+        new_item = priority_item[1]
+        self.remove(priority_item)
+        heapq.heapify(self)
+        return self.priority_insert(new_item, priority)

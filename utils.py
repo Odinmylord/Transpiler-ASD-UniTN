@@ -4,17 +4,22 @@ from typing import Tuple, List
 import known_functions.graphs as graphs
 
 GRAPHS_FUNCTIONS = [func for func in dir(graphs) if not func.startswith("__")]
+
 KNOWN_FUNCTIONS = GRAPHS_FUNCTIONS
+
 FUNCTIONS_MAPPER = {
     "graphs": GRAPHS_FUNCTIONS
 }
+
 TYPES_LIST = ["int", "float", "bool", "string", "boolean"]
+
 STRUCTS_LIST = {
     "Set": "set",
     "Graph": "GraphDict",
     "Node": "int",
     "Tree": "Tree",
     "Queue": "Queue",
+    "MinPriorityQueue": "MinPriorityQueue",
     "Stack": "Stack"
 }
 
