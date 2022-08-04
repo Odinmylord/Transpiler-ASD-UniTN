@@ -22,6 +22,7 @@ All the functions inside `known_functions` folder, `GraphDict` class and `Tree` 
 
 - Use `-Y` to skip prompt while converting math operations like floor and ceiling
 - Use `--noMath` to make the transpiler ignore the declaration of math.floor and math.ceil
+- Use `-o [filename]` to change the output file name, default is [filename].py
 
 # Known Issues
 
@@ -31,7 +32,7 @@ All the functions inside `known_functions` folder, `GraphDict` class and `Tree` 
 # TODO
 
 - Move mapping and regex dict to a file so that is easier to edit for the user
-- Add more flags like -o
+- Add more flags
 - Add missing data structures
 
 Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
