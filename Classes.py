@@ -56,24 +56,31 @@ class GraphDict:
         self.nodes[u] = {}
         return True
 
-    def insert_edge(self, u, v, w=0):
-        """Inserts an edge from the node u to the node v, is also possible to give the edge a weight"""
+    def insert_edge(self, u, v, w=0, directed=True):
+        """Inserts an edge from the node u to the node v, is also possible to give the edge a weight.
+        If directed is False then the edges are added in both directions"""
         self.insertNode(u)
         self.insertNode(v)
         edges_list = self.nodes.get(u, None)
         if edges_list is None:
             return False
+        if not directed:
+            other_list = self.nodes.get(v, None)
+            other_list[u] = w
         edges_list[v] = w
         return True
 
 
 class Tree:
-    """Implementation of a tree based with methods defined in Alberto Montresor's slide"""
+    """Implementation of a binary_tree based with methods defined in Alberto Montresor's slide"""
 
-    def __init__(self, v):
+    def __init__(self, v, key=None):
+        """Key value is only needed to work with binary research trees"""
+        key = v if key is None else key
         self.parent = None
         self.left = self.right = None
         self.value = v
+        self.key = key
         self.insertLeft = self.insert_left
         self.insertRight = self.insert_right
 
@@ -100,8 +107,10 @@ class Tree:
             self.right = None
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
+
+# TODO add non-binary tree
 
 class Stack:
 
