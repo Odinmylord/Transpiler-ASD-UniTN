@@ -4,7 +4,7 @@ A transpiler that translates pseudocode from Alberto Montresor book and slides i
 It can also be used to translate the code from exams solutions.
 
 # Credits:
-All the functions inside `known_functions` folder, `GraphDict` class and `Tree` class are translated or taken from Alberto Montresor slides available at
+All the functions inside `known_functions` folder, and many classes inside `Classes` are translated or taken from Alberto Montresor slides available at
 [his site](https://cricca.disi.unitn.it/montresor/). They are available under license [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 # Usage
