@@ -74,13 +74,14 @@ class GraphDict:
 class Tree:
     """Implementation of a binary_tree based with methods defined in Alberto Montresor's slide"""
 
-    def __init__(self, v, key=None):
+    def __init__(self, v, key=None, color=0):
         """Key value is only needed to work with binary research trees"""
         key = v if key is None else key
         self.parent = None
         self.left = self.right = None
         self.value = v
         self.key = key
+        self.color = color
         self.insertLeft = self.insert_left
         self.insertRight = self.insert_right
 

@@ -2,6 +2,8 @@ from Classes import Tree
 
 """The known_functions inside this file are translated from Alberto Montresor site 
 https://cricca.disi.unitn.it/montresor/ the original work is available under license CC BY-SA 4.0 """
+BLACK = 0
+RED = 1
 
 
 def count(T: Tree):
@@ -63,7 +65,7 @@ def max(T: Tree):
     return u
 
 
-def insertNode(T: Tree, k, v):
+def insertNode(T: Tree, k, v):  # Capire perché si rompe e va in un loop infinito
     p = None  # Padre
     u = T
     while u is not None and u.key != k:  # Cerca posizione inserimento
@@ -72,8 +74,9 @@ def insertNode(T: Tree, k, v):
     if u is not None and u.key == k:
         u.value = v  # Chiave già presente
     else:
-        new = Tree(k, v)  # Crea un nodo coppia chiave-valore
+        new = Tree(v, k)  # Crea un nodo coppia chiave-valore (inverted v and k)
         link(p, new, k)
+        balanceInsert(new)  # Didn't change this part hoping that it won't cause problems to non red-black trees
         if p is None:
             T = new  # Primo nodo ad essere inserito
     return T  # Restituisce albero non modificato o nuovo nodo
@@ -87,3 +90,32 @@ def link(p: Tree, u: Tree, k):
             p.left = u  # Attaccato come figlio sinistro
         else:
             p.right = u  # Attaccato come figlio destro
+
+
+# RED-BLACK TREES FUNCTIONS
+
+def balanceInsert(t: Tree):
+    t.color = RED
+    while t != None:
+        p = t.parent  # Padre
+        n = (p.parent if p != None else None)  # Nonno
+        z = (None if n == None else (n.right if n.left == p else n.left))  # Zio
+
+
+def rotateLeft(x: Tree):
+    y = x.right
+    p = x.parent
+    x.right = y.left  # II sottoalbero B diventa figlio destro di x
+    if y.left != None: y.left.parent = x
+    y.left = x  # x diventa figlio sinistro di y
+    x.parent = y
+    y.parent = p  # y diventa figlio di p
+    if p != None:
+        if p.left == x:
+            p.left = y
+        else:
+            p.right = y
+    return y
+
+
+# TODO aggiungere rotazione e destra

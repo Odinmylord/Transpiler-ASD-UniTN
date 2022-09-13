@@ -14,7 +14,7 @@ def main():
         print("Usage: python3 main.py <filename>")
         sys.exit(1)
     filename = files[1]
-    out_name = filename+".py"
+    out_name = filename + ".py"
 
     if "-Y" in flags:
         skip_confirmation = True
@@ -22,12 +22,13 @@ def main():
         no_math = True
     elif "-o" in flags:
         flag_index = sys.argv.index("-o")
-        out_name = sys.argv[flag_index+1]
+        out_name = sys.argv[flag_index + 1]
 
     with open(filename, "r") as f, open(out_name, "w") as out:
         out.write("import math\n")
-        out.write("from Classes import "+", ".join(CLASSES)+"\n")
+        out.write("from Classes import " + ", ".join(CLASSES) + "\n")
         out.write("import known_functions.graphs, new_functions.useful_functions\n")
+        out.write("BLACK = 0\nRED = 1\n")  # Needed because of Red-Black trees
         for line in f:
             line = line.rstrip()
             use_regex = False

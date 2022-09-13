@@ -17,7 +17,9 @@ STRUCTS_LIST = {
     "Set": "set",
     "Graph": "GraphDict",
     "Node": "int",
+    "Item": "int",
     "Tree": "Tree",
+    "TREE": "Tree",
     "Queue": "Queue",
     "MinPriorityQueue": "MinPriorityQueue",
     "Stack": "Stack"
@@ -154,7 +156,7 @@ def var_declaration(line: str) -> str:
     default_value = ""
     name_part = line[:equal_index].strip()
     var_name = name_part.split(" ")[-1] if " " in name_part else None
-    if line.count("=") == 2:
+    if line.count("=") == 2 and "iif" not in line:
         default_value = line[line.index("{") + 1:line.index("}")]
     if is_known_function(tokens):
         function_name, function_module = get_func_declaration(tokens[-1])
@@ -207,7 +209,7 @@ def array_declaration(struct_declaration: str, default_value: str = None):
 
 def inline_if_translator(line: str) -> str:
     while line.count("iif"):
-        iif_index = line.index("iif")
+        iif_index = line.rindex("iif")
         count = 0
         index = iif_index + 3
         for c in line[iif_index + 3:]:
@@ -223,6 +225,8 @@ def inline_if_translator(line: str) -> str:
         iif_to_change = line[iif_index:index]
         tokens = iif_to_change.split(",")
         condition = tokens[0][tokens[0].index("(") + 1:]
+        if "=" in condition.split(" "):
+            condition = condition.replace("=", "==", 1)
         failure = tokens[-1][:-1]
         success = ",".join(tokens[1:len(tokens) - 1])
         new_iif = "(" + success + " if " + condition + " else " + failure + ")"
