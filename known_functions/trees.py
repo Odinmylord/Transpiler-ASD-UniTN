@@ -106,7 +106,8 @@ def rotateLeft(x: Tree):
     y = x.right
     p = x.parent
     x.right = y.left  # II sottoalbero B diventa figlio destro di x
-    if y.left != None: y.left.parent = x
+    if y.left != None:
+        y.left.parent = x
     y.left = x  # x diventa figlio sinistro di y
     x.parent = y
     y.parent = p  # y diventa figlio di p
@@ -118,4 +119,18 @@ def rotateLeft(x: Tree):
     return y
 
 
-# TODO aggiungere rotazione e destra
+def rotateRight(x: Tree):
+    y = x.left
+    p = x.parent
+    x.left = y.right  # II sottoalbero B diventa figlio sinistro di x
+    if y.right != None:
+        y.right.parent = x
+    y.right = x  # x diventa figlio destro di y
+    x.parent = y
+    y.parent = p  # Change parent of y as parent of x
+    if p != None:
+        if p.right == x:
+            p.right = y
+        else:
+            p.left = y
+    return y
