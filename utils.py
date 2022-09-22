@@ -2,13 +2,16 @@ import re
 from typing import Tuple, List
 
 import known_functions.graphs as graphs
+import known_functions.trees as trees
 
 GRAPHS_FUNCTIONS = [func for func in dir(graphs) if not func.startswith("__")]
+TREES_FUNCTIONS = [func for func in dir(trees) if not func.startswith("__")]
 
-KNOWN_FUNCTIONS = GRAPHS_FUNCTIONS
+KNOWN_FUNCTIONS = GRAPHS_FUNCTIONS + TREES_FUNCTIONS
 
 FUNCTIONS_MAPPER = {
-    "graphs": GRAPHS_FUNCTIONS
+    "graphs": GRAPHS_FUNCTIONS,
+    "trees": TREES_FUNCTIONS
 }
 
 TYPES_LIST = ["int", "float", "bool", "string", "boolean"]
@@ -48,7 +51,8 @@ MAPPING = {
     " % ": "#  ",  # It will surely give problems, but it is necessary for comments
     " mod ": "%",
     "boolean": "bool",
-    "null": "None"
+    "null": "None",
+    "delete": "del"
 }
 REGEXES = {
     "\)(?=\d+)": ")**",  # This is a try to solve the problem of the power that can't be recognized
@@ -58,7 +62,7 @@ REGEXES = {
 def is_function(line: str) -> bool:
     """
     :param line: a line of pseudo-code
-    :return: True if the line is a known_functions, False otherwise
+    :return: True if the line is a function, False otherwise
     :return:
     """
     return line[0].isalpha() and line.count("(") == 1 and line[-1] == ")"
@@ -67,7 +71,7 @@ def is_function(line: str) -> bool:
 def extract_function(line: str) -> Tuple[str, dict]:
     """
     :param line: a line of pseudo-code
-    :return: the known_functions name and params
+    :return: the function's name and params
     :return:
     """
     param_mapping = {}
@@ -90,9 +94,9 @@ def extract_function(line: str) -> Tuple[str, dict]:
 
 def build_function(name: str, params: dict) -> str:
     """
-    :param name: the known_functions name
-    :param params: the known_functions params
-    :return: the known_functions definition
+    :param name: the function name
+    :param params: the function params
+    :return: the function definition
     """
     function_def = "def " + name + "("
     for param in params:
@@ -126,7 +130,7 @@ def is_declaration(line: str) -> bool:
 
 
 def is_known_function(tokens: List[str]) -> bool:
-    if "(" not in tokens[-1]:
+    if not tokens or "(" not in tokens[-1]:
         return False
     return_value = False
     func_call = tokens[-1]
@@ -144,6 +148,22 @@ def get_func_declaration(func: str) -> Tuple[str, str]:
             return func_name, module
 
 
+def compact_tokens(tokens: list) -> list:
+    compacted = False
+    compacted_tokens = tokens
+    if "(" in tokens[-1] and ")" in tokens[-1]:
+        compacted = True
+
+    if not compacted:
+        original_string = " ".join(tokens)
+        open_index = original_string.rindex("(")
+        first_half = original_string[:open_index]
+        second_half = original_string[open_index:]
+        second_half = second_half.replace(" ", "")
+        compacted_tokens = (first_half + second_half).split(" ")
+    return compacted_tokens
+
+
 def var_declaration(line: str) -> str:
     """
     :param line: a line of pseudo-code
@@ -152,15 +172,18 @@ def var_declaration(line: str) -> str:
     left_offset = left_offset_calculator(line)
     line = line.strip()
     tokens = line.split(" ")
+    compacted_tokens = []
+    if "(" in line:
+        compacted_tokens = compact_tokens(tokens)
     equal_index = line.index("=")
     default_value = ""
     name_part = line[:equal_index].strip()
     var_name = name_part.split(" ")[-1] if " " in name_part else None
     if line.count("=") == 2 and "iif" not in line:
         default_value = line[line.index("{") + 1:line.index("}")]
-    if is_known_function(tokens):
-        function_name, function_module = get_func_declaration(tokens[-1])
-        var = left_offset + var_name + " =" + f" known_functions.{function_module}." + tokens[-1].strip()
+    if is_known_function(compacted_tokens):
+        function_name, function_module = get_func_declaration(compacted_tokens[-1])
+        var = left_offset + var_name + " =" + f" known_functions.{function_module}." + compacted_tokens[-1].strip()
 
     elif "[" in name_part and "new" in line:
         new_pos = tokens.index("new")
@@ -175,6 +198,18 @@ def var_declaration(line: str) -> str:
         var = left_offset + line[line.index(" ") + 1:]
     return var
 
+
+def isolated_function(line: str) -> str:
+    left_offset = left_offset_calculator(line)
+    line = line.strip()
+    tokens = line.split(" ")
+    compacted_tokens = []
+    if "(" in line:
+        compacted_tokens = compact_tokens(tokens)
+    if is_known_function(compacted_tokens):
+        function_name, function_module = get_func_declaration(compacted_tokens[-1])
+        line = left_offset + f"known_functions.{function_module}." + compacted_tokens[-1].strip()
+    return line
 
 def array_declaration(struct_declaration: str, default_value: str = None):
     """
