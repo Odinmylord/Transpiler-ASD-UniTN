@@ -81,6 +81,29 @@ def insertNode(T: Tree, k, v):  # Capire perché si rompe e va in un loop infini
             T = new  # Primo nodo ad essere inserito
     return T  # Restituisce albero non modificato o nuovo nodo
 
+def removeNode(T: Tree, k: int):
+    t = None
+    u = lookupNode(T, k)
+    if u != None:
+        if u.left == None and u.right == None:  # Caso 1
+            link(u.parent, None, k)
+            del u
+        elif u.left != None and u.right != None:  # Caso 3
+            s = successorNode(u)
+            link(s.parent, s.right, s.key)
+            u.key = s.key
+            u.value = s.value
+            del s
+        elif u.left != None and u.right == None:  # Caso 2
+            link(u.parent, u.left, k)
+            if u.parent == None:
+                T = u.left
+        else:
+            link(u.parent, u.right, k)
+            if u.parent == None:
+                T = u.right
+    return T
+
 
 def link(p: Tree, u: Tree, k):
     if u is not None:
