@@ -161,6 +161,7 @@ class MinPriorityQueue(list):
         super().__init__()
         heapq.heapify(self)
         self.deleteMin = self.delete_min
+        self.delMin = self.delete_min
         self.insert = self.priority_insert
 
     def isEmpty(self) -> bool:

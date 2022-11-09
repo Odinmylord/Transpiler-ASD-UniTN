@@ -3,12 +3,14 @@ from typing import Tuple, List
 
 import known_functions.graphs as graphs
 import known_functions.trees as trees
+import known_functions.various as various
+import Classes
 
 GRAPHS_FUNCTIONS = [func for func in dir(graphs) if not func.startswith("__")]
 TREES_FUNCTIONS = [func for func in dir(trees) if not func.startswith("__")]
-
-KNOWN_FUNCTIONS = GRAPHS_FUNCTIONS + TREES_FUNCTIONS
-
+VARIOUS_FUNCTIONS = [func for func in dir(various) if not func.startswith("__")]
+CLASSES = [new_class for new_class in dir(Classes) if not new_class.startswith("__")]
+KNOWN_FUNCTIONS = GRAPHS_FUNCTIONS + TREES_FUNCTIONS + VARIOUS_FUNCTIONS
 FUNCTIONS_MAPPER = {
     "graphs": GRAPHS_FUNCTIONS,
     "trees": TREES_FUNCTIONS
@@ -25,6 +27,7 @@ STRUCTS_LIST = {
     "TREE": "Tree",
     "Queue": "Queue",
     "MinPriorityQueue": "MinPriorityQueue",
+    "PriorityQueue": "MinPriorityQueue",  # Not sure if it is a good idea
     "Stack": "Stack"
 }
 
@@ -209,7 +212,10 @@ def isolated_function(line: str) -> str:
     if is_known_function(compacted_tokens):
         function_name, function_module = get_func_declaration(compacted_tokens[-1])
         line = left_offset + f"known_functions.{function_module}." + compacted_tokens[-1].strip()
+    else:
+        line = left_offset + line
     return line
+
 
 def array_declaration(struct_declaration: str, default_value: str = None):
     """
