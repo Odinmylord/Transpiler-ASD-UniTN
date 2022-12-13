@@ -1,8 +1,9 @@
-from Classes import ListOneBased, GraphDict
 import new_functions.useful_functions
+from utility.Classes import ListOneBased, GraphDict
 
 """The known_functions inside this file are translated from Alberto Montresor site https://cricca.disi.unitn.it/montresor/
     the original work is available under license CC BY-SA 4.0"""
+
 
 # Start of CC function for connected components
 def cc(G: GraphDict):
@@ -22,6 +23,8 @@ def ccdfs(G: GraphDict, counter: ListOneBased, u: int, id: ListOneBased):
     for v in G.adj(u):
         if id[v] == 0:
             ccdfs(G, counter, v, id)
+
+
 # end of CC function for connected components
 
 # start of functions to find cycles inside graphs

@@ -1,4 +1,5 @@
-from Classes import ListOneBased, MinPriorityQueue, Tree
+from utility.Classes import ListOneBased, MinPriorityQueue, Tree
+
 
 def huffman(c: ListOneBased, f: ListOneBased, n: int):
     Q = MinPriorityQueue()

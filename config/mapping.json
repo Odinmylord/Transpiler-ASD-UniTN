@@ -1,0 +1,23 @@
+{
+    " then": ":",
+    "else if": "elif",
+    "else": "else:",
+    "6 =": "!=",
+    " ≤": "<=",
+    " ≥": ">=",
+    "·": "*",
+    "−": "-",
+    "∈": "in",
+    "foreach": "for",
+    " do": ":",
+    "nil": "None",
+    "false": "False",
+    "true": "True",
+    "〈": "(",
+    "〉": ")",
+    " % ": "#  ",
+    " mod ": "%",
+    "boolean": "bool",
+    "null": "None",
+    "delete": "del"
+  }

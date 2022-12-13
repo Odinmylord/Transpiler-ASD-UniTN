@@ -133,3 +133,4 @@ dmypy.json
 # file di test
 test.py
 test
+*.pdf

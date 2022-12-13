@@ -1,0 +1,20 @@
+{
+    "while": "TTSA1",
+    "right": "TTSA2",
+    "math": "TTSA3",
+    "boolean": "TTSA4",
+    "h-index": "TTSA5",
+    "hi": "TTSA6",
+    "With": "TTSA07",
+    "the": "TTSA08",
+    "queue": "TTSA09",
+    "dequeue": "TTSB1",
+    "new": "TTSB2",
+    "Node": "TTSB3",
+    "add": "TTSB4",
+    "true": "TTSB5",
+    "false": "TTSB6",
+    "Apple": "TTSB7",
+    "ListOneBased": "TTSB8",
+    "range": "TTSB9"
+}

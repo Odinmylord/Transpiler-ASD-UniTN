@@ -1,0 +1,13 @@
+{
+    "Set": "set",
+    "Graph": "GraphDict",
+    "Node": "int",
+    "Item": "int",
+    "INTEGER": "int",
+    "Tree": "Tree",
+    "TREE": "Tree",
+    "Queue": "Queue",
+    "MinPriorityQueue": "MinPriorityQueue",
+    "PriorityQueue": "MinPriorityQueue",
+    "Stack": "Stack"
+}

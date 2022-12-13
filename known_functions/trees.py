@@ -1,4 +1,4 @@
-from Classes import Tree
+from utility.Classes import Tree
 
 """The known_functions inside this file are translated from Alberto Montresor site 
 https://cricca.disi.unitn.it/montresor/ the original work is available under license CC BY-SA 4.0 """
