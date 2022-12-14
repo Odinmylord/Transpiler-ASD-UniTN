@@ -8,7 +8,7 @@ All the functions inside `known_functions` folder, and many classes inside `Clas
 [his site](https://cricca.disi.unitn.it/montresor/). They are available under license [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 # Usage
-##Using pdf as source
+## Using pdf as source
 - Download a pdf file from [Alberto Montresor site](https://cricca.disi.unitn.it/montresor/teaching/asd/materiale/esercizi/)
 - Put it in the same folder of the transpiler
 - Run the script: `python3 main.py --pdf [filename].pdf` 
@@ -16,7 +16,7 @@ All the functions inside `known_functions` folder, and many classes inside `Clas
 The pdf reader module is made from scratch without installing new libraries so it will probably have problems.<br/>
 If you find any feel free to open an issue.
 
-##Copying from pdf
+## Copying from pdf
 - Copy the code from a pdf
 - Paste it into a file
 - Indent the code (Indentation doesn't get copied)
@@ -55,6 +55,7 @@ the files in the config folder.
 - Add more flags
 - Add missing data structures
 
+# License
 Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
 
 This work is licensed under a
