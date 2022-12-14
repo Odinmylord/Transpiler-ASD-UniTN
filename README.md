@@ -11,7 +11,7 @@ All the functions inside `known_functions` folder, and many classes inside `Clas
 ##Using pdf as source
 - Download a pdf file from [Alberto Montresor site](https://cricca.disi.unitn.it/montresor/teaching/asd/materiale/esercizi/)
 - Put it in the same folder of the transpiler
-- Run the script: `python3 main.py --pdf` 
+- Run the script: `python3 main.py --pdf [filename].pdf` 
 
 The pdf reader module is made from scratch without installing new libraries so it will probably have problems.<br/>
 If you find any feel free to open an issue.
