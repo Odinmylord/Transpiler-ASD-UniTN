@@ -271,6 +271,8 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
     left_offset = left_offset_calculator(line)
     original_line = line
     line = line.strip()
+    if not no_math and not line.startswith("def"):
+        line = check_math_func(line, skip_confirmation)
     for key in MAPPING:
         line = line.replace(key, MAPPING[key])
     if regex:
@@ -279,8 +281,6 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
 
     if "iif" in line:
         line = inline_if_translator(line)
-    if not no_math and not line.startswith("def"):
-        line = check_math_func(line, skip_confirmation)
     if line.startswith("for") and "∈" not in original_line and "in" not in original_line.split(" "):
         line = for_translator(line)
     elif line.startswith("for"):
@@ -313,11 +313,11 @@ def check_math_func(line: str, skip_confirmation: bool) -> str:
     :param skip_confirmation: if true doesn't prompt user when converting
     :return: the line with the known_functions replaced
     """
-    comment_start = line.find("#")
+    comment_start = line.find("%")
     comment = ""
     if comment_start >= 0:
-        line = line[:comment_start]
         comment = line[comment_start:]
+        line = line[:comment_start]
     matches = utility.utils.find_patterns(line)
     ask = not skip_confirmation
     for match in matches:
