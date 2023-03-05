@@ -1,0 +1,5 @@
+{
+    "\\)(?=\\d+)": ")**",
+    "copy[ ]?\\(": "new_functions.useful_functions.copy(",
+    "swap[ ]?\\(": "new_functions.useful_functions.swap("
+}

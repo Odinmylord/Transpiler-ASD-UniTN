@@ -25,9 +25,7 @@ TAB_SPACES = 4
 INDENTATION_TYPE = " "
 
 MAPPING = utility.utils.json_loader("mapping.json")
-REGEXES = {
-    "\)(?=\d+)": ")**",  # This is a try to solve the problem of the power that can't be recognized
-}
+REGEXES = utility.utils.json_loader("regexes.json")
 
 skip = []
 ignore = []
@@ -277,11 +275,12 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
         line = line.replace(key, MAPPING[key])
     if regex:
         for regex in REGEXES:
+            regex = regex.replace("\\\\", "\\")
             line = re.sub(regex, REGEXES[regex], line)
 
     if "iif" in line:
         line = inline_if_translator(line)
-    if line.startswith("for") and "∈" not in original_line and "in" not in original_line.split(" "):
+    if line.startswith("for") and "∈" not in original_line and "in" not in line:
         line = for_translator(line)
     elif line.startswith("for"):
         if "- {" in line:
@@ -298,7 +297,7 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
     if "|" in line:
         line = abs_value(line)
     if "sort" in line and not line.startswith("def"):
-        target = line[line.index("sort("):]
+        target = line[line.index("sort"):]
         target = target[:target.index(")")]
         line = line.replace("sort", "list.sort")
         if "," in target:

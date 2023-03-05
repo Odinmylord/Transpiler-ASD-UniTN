@@ -4,8 +4,11 @@ import zlib
 
 import utility.utils
 from utility.conversion_functions import TYPES_LIST, STRUCTS_LIST, comment_formatter
+from utility.regexes import long_line_regex, drawn_line_regex, parts_regex, pos_regex, horizontal_line_regex, \
+    vertical_line_regex
 
 MAGIC_INDENTATION_SIZE_NUMBER = 17
+MAGIC_MINIMUM_SPACE_NUMBER_SIZE = 3.4
 # TODO find a way to avoid manually mapping symbol conversions
 pdf_conversions = utility.utils.json_loader("pdf_conversions.json")
 
@@ -84,11 +87,6 @@ def convert_from_pdf(file: str, out_file_name=None, sub_divisions=True, log_file
 
     cont3_blocks = cont.split("BT")
     parts_values = {}
-    long_line_regex = r"[0-9 ]{8}[0-9.]{6} [0-9.]{6,7} cm"
-    drawn_line_regex = r"\[\d*\]\d d [0-2] J [0-9.]+ w [0-9.]+ [0-9.]+ m \d{3}.\d{2} [0-9.]+ l S"
-    pos_regex = r"[0-9.-]+ [0-9.-]+ T[dm] \[\("
-    # parts_regex = r"T[dm] \[\((.+?)\)\]" old one that didn't save Font value
-    parts_regex = r"(/F[0-9]{1,3})*.*?T[dm] \[\((.+?)\)\]"
     total_parts = 0
     drawn_line_count = 0
     last_pos = 0
@@ -96,20 +94,32 @@ def convert_from_pdf(file: str, out_file_name=None, sub_divisions=True, log_file
     variation = 0
     is_long_line = False
     power = False
+    # this is the new indentation variable
+    vertical = 0
     total_indentation = 0
+    actual_x = ""
+    last_x = ""
+    old_x = {}
+    closed = False
     for cont3_block in cont3_blocks:
-        indentation = 0
 
         for line in cont3_block.split("\n"):
             if drawn_line_count == 3:
                 drawn_line_count = 0
-                indentation = 0
+                vertical = 0
                 variation = 0
                 new_text += "\n\n"
                 first_time = True
                 is_long_line = False
+                old_x = {}
+
             if not is_long_line:
                 is_long_line = re.match(long_line_regex, line)
+            if is_long_line:
+                last_x = actual_x if actual_x else last_x
+                actual_x = is_long_line.group(1) if is_long_line else ""
+                old_x[vertical] = last_x
+                is_long_line = False
 
             elif re.match(drawn_line_regex, line):  # The line is both long and drawn
                 drawn_line_count += 1
@@ -119,6 +129,18 @@ def convert_from_pdf(file: str, out_file_name=None, sub_divisions=True, log_file
                 is_long_line = False
 
             if drawn_line_count >= 1:
+                if vertical == 0 and drawn_line_count == 2:
+                    vertical = 1
+                if re.match(vertical_line_regex, line):
+                    vertical += 1
+                    closed = False
+                elif vertical:
+                    o_match = re.match(horizontal_line_regex, line)
+                    if o_match:
+                        pos = o_match.group()
+                        closed = True
+                        vertical -= 1
+
                 parts = re.findall(parts_regex, line)
                 positions = re.findall(pos_regex, line)
                 spaces = [space.split(" ")[0] for space in positions]
@@ -138,6 +160,7 @@ def convert_from_pdf(file: str, out_file_name=None, sub_divisions=True, log_file
                         first_time = False
                     count_parts += 1
                     total_parts += 1
+
                     space_to_add = float(spaces[count_parts])
                     height = float(heights[count_parts])
                     old_part_is_comment = parts_values.get(total_parts - 1, {}).get("part") == "INSERT_COMMENT_HERE"
@@ -164,24 +187,16 @@ def convert_from_pdf(file: str, out_file_name=None, sub_divisions=True, log_file
                     if part == "INSERT_COMMENT_HERE":
                         first_part = False
                     if new_text[-1] == "\n":
-                        modifier = 0
-                        if abs(starting_pos - last_pos) > MAGIC_INDENTATION_SIZE_NUMBER:
-                            modifier = int((starting_pos - last_pos) / MAGIC_INDENTATION_SIZE_NUMBER)
-                        if abs(starting_pos - last_pos) < 5.72:  # Error Margin
-                            pass
-                        elif starting_pos < last_pos:
-                            variation -= 1
-                        elif starting_pos > last_pos:
-                            variation += 1
-                        variation += modifier
-                        total_indentation = indentation + variation
+                        if not closed and (part == "else" or float(actual_x) > starting_pos):
+                            vertical -= 1
+                        total_indentation = vertical
                         new_text += "\t" * total_indentation
                     elif "=" in [new_text[-1], new_text[-2]] and parts_values[total_parts - 1].get("font") == "/F22" \
                             and sub_divisions:
                         new_text = new_text[:-2] if new_text[-2] == "=" else new_text[:-1]
                         new_text += "/ "
                     new_text += part
-                    if (abs(space_to_add) > 4.5 or part[-1] == ")") and not part[-1] == ".":
+                    if (abs(space_to_add) > MAGIC_MINIMUM_SPACE_NUMBER_SIZE or part[-1] == ")") and not part[-1] == ".":
                         new_text += " "
                     parts_values[total_parts] = {
                         "part": part,
@@ -191,9 +206,14 @@ def convert_from_pdf(file: str, out_file_name=None, sub_divisions=True, log_file
                         "starting_at": starting_pos,
                         "actually_at": actual_pos,
                         "last_at": last_pos,
-                        "drawn_line_number": drawn_line_count,
-                        "total_indentation": total_indentation
                     }
+                    if log_files:
+                        parts_values[total_parts]["additional_info"] = {
+                            "drawn_line_number": drawn_line_count,
+                            "total_indentation": total_indentation,
+                            "actual_x": actual_x,
+                            "old_x": old_x.copy()
+                        }
                     last_pos = starting_pos
             last_line = new_text.split("\n")[-1] if "\n" in new_text else None
             if drawn_line_count == 1 and last_line:

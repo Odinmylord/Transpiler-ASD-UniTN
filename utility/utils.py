@@ -13,11 +13,10 @@ def json_loader(file_name: str) -> dict:
         return json.load(f)
 
 
-# This part will be useful only for copied and pasted text I hope
-
 line_sanitizers = json_loader("line_sanitizers.json")
 char_pairs = json_loader("char_pairs.json")
 char_pairs_with_space = json_loader("char_pairs_with_space.json")
+font_58_mapping = json_loader("font_58_mapping.json")
 char_pairs_regexes = [re.compile(char_pair[0] + fr"(?P<{char_pair[0]}{char_pair[1]}>[^\s].*?)" + char_pair[1]) for
                       char_pair in char_pairs]
 char_pairs_with_space_regexes = [re.compile(char_pair[0] + fr"(?P<{char_pair[0]}{char_pair[1]}>.+?)" + char_pair[1]) for
@@ -115,4 +114,8 @@ def get_symbol_from_char(c: str) -> typing.Union[str, None]:
         index = key.find(c)
         if index >= 0:
             return_val = char_pairs_with_space.get(key, [None for _ in range(index)])[index]
+    for key in font_58_mapping:
+        index = key.find(c)
+        if index >= 0:
+            return_val = font_58_mapping.get(key, [None for _ in range(index)])[index]
     return return_val

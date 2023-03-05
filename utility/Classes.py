@@ -190,3 +190,18 @@ class MinPriorityQueue(list):
         self.remove(priority_item)
         heapq.heapify(self)
         return self.priority_insert(new_item, priority)
+
+
+class Set(set):
+    def __init__(self):
+        super().__init__()
+        self.isEmpty = self.is_empty
+
+    def is_empty(self) -> bool:
+        return len(self) == 0
+
+    def insert(self, elem):
+        self.add(elem)
+
+    def contains(self, elem):
+        return elem in self
