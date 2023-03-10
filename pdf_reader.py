@@ -169,9 +169,9 @@ def convert_from_pdf(file: str, out_file_name=None, sub_divisions=True, log_file
                     elif space_to_add > 0 and old_part_is_comment:
                         last_pos = parts_values.get(total_parts - 2, {}).get("starting_at", 0)
                     if height < 0 and power:
-                        new_text += ")"
+                        new_text += ") "
                         power = False
-                    elif height < 0 or height >= 4:
+                    elif height < -2 or height >= 4:
                         new_text += "\n"
                         first_part = True
                     elif 2 < height < 4:
@@ -195,6 +195,10 @@ def convert_from_pdf(file: str, out_file_name=None, sub_divisions=True, log_file
                             and sub_divisions:
                         new_text = new_text[:-2] if new_text[-2] == "=" else new_text[:-1]
                         new_text += "/ "
+                    # F18 for subscript numbers F117 for letters
+                    # TODO find better way to handle this case
+                    if font in ["/F18", "/F117"] and new_text[-1] == " ":
+                        new_text = new_text[:-1]
                     new_text += part
                     if (abs(space_to_add) > MAGIC_MINIMUM_SPACE_NUMBER_SIZE or part[-1] == ")") and not part[-1] == ".":
                         new_text += " "

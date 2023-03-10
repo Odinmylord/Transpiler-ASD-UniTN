@@ -63,7 +63,7 @@ def main():
         out.write("import math\n")
         out.write("from utility.Classes import " + ", ".join(CLASSES) + "\n")
         for function_file in FUNCTIONS_FILES:
-            out.write(f"import known_functions.{function_file}\n")
+            out.write(f"import known_functions.{function_file} as {function_file}\n")
         out.write("import new_functions.useful_functions\n")
         out.write("from known_functions.trees import BLACK as BLACK\n")
         out.write("from known_functions.trees import RED as RED\n")

@@ -105,12 +105,16 @@ def is_known_function(tokens: List[str]) -> bool:
     if not tokens or "(" not in tokens[-1]:
         return False
     return_value = False
-    func_call = tokens[-1]
+    func_call = tokens[-1] if tokens[-1][0] != "(" else "".join(tokens[-2:])
     parenthesis_index = func_call.index("(")
     function_name = func_call[:parenthesis_index]
     if function_name in KNOWN_FUNCTIONS:
         return_value = True
     return return_value
+
+
+def get_func_call(tokens: List[str]) -> str:
+    return "".join(tokens[-2:]) if tokens[-1][0] == "(" else tokens[-1]
 
 
 def get_func_declaration(func: str) -> Tuple[str, str]:
@@ -150,8 +154,9 @@ def var_declaration(line: str, no_math: bool, skip_confirmation: bool) -> str:
             import sys
             sys.exit(3)
     if is_known_function(compacted_tokens):
-        function_name, function_module = get_func_declaration(compacted_tokens[-1])
-        var = left_offset + var_name + " =" + f" known_functions.{function_module}." + compacted_tokens[-1].strip()
+        func_call = get_func_call(compacted_tokens)
+        function_name, function_module = get_func_declaration(func_call)
+        var = left_offset + var_name + " =" + f" {function_module}." + func_call
 
     elif "[" in name_part and "new " in line:
         new_pos = tokens.index("new")
@@ -178,8 +183,9 @@ def isolated_function(line: str) -> str:
     if "(" in line:
         compacted_tokens = compact_tokens(tokens)
     if is_known_function(compacted_tokens):
-        function_name, function_module = get_func_declaration(compacted_tokens[-1])
-        line = left_offset + f"known_functions.{function_module}." + compacted_tokens[-1].strip()
+        func_call = get_func_call(compacted_tokens)
+        function_name, function_module = get_func_declaration(func_call)
+        line = left_offset + f"{function_module}." + func_call.strip()
     else:
         line = left_offset + line
     return line
@@ -246,16 +252,27 @@ def inline_if_translator(line: str) -> str:
 def for_translator(line: str):
     tokens = line.split(" ")
     var_name = tokens[1]
-    base = tokens[3]
+    down_to = "downto" in line
+    limiter = "downto" if down_to else "to"
+    second_block_index = tokens.index(limiter)
+    base = tokens[tokens.index("=") + 1:  second_block_index]
+    base = " ".join(base)
+    step_index = tokens.index("step") if "step" in line else len(tokens)
     try:
-        limit = " ".join(tokens[5:]).strip(":")
+        limit = " ".join(tokens[second_block_index + 1: step_index]).strip(":")
     except IndexError:
         print(traceback.format_exc())
         print(line)
         print("Error while translating the for in the line above, maybe you forgot to put a ∈ symbol")
         import sys
         sys.exit(2)
-    return f"for {var_name} in range({base}, {limit}+1):"
+    step = ""
+    if down_to:
+        step = ", -1"
+    elif step_index != len(tokens):
+        step = "," + " ".join(tokens[step_index+1:]).strip(":")
+    line = f"for {var_name} in range({base}, {limit}+1{step}):"
+    return line
 
 
 def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool = False) -> str:
@@ -293,7 +310,15 @@ def remap(line: str, regex=False, skip_confirmation: bool = False, no_math: bool
     if line.startswith("print "):
         line = line.replace("print ", "print(")
         line = line.replace("...", ":")  # May break something
-        line += ")"
+        if "#" in line:
+            line = line.replace("#", ")#")
+        else:
+            line += ")"
+    if "$" in line:
+        #swap
+        parts = line.split("$")
+        line = line.replace("$", ",")
+        line += f" = {parts[1]}, {parts[0]}"
     if "|" in line:
         line = abs_value(line)
     if "sort" in line and not line.startswith("def"):
