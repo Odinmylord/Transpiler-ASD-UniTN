@@ -50,6 +50,11 @@ the files in the config folder.
 - Still didn't find a consistent way to check for power operator (Solved while using `--pdf`)
 - Inconsistent recognition of math.floor and math.ceil functions (Solved while using `--pdf`)
 
+# Changelog
+
+- Improved the translation of the "for" instruction
+- (pdf) Started using the vertical lines as an indicator for intentation 
+
 # TODO
 
 - Add more flags

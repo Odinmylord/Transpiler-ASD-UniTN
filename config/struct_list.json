@@ -1,5 +1,5 @@
 {
-    "Set": "set",
+    "Set": "Set",
     "Graph": "GraphDict",
     "Node": "int",
     "Item": "int",

@@ -29,7 +29,7 @@ def successorNode(t: Tree):
     if t == None:
         return t
     if t.right != None:  # Caso 1
-        return min(t.right)
+        return _min(t.right)
     else:  # Caso 2
         p = t.parent
         while p != None and t == p.right:
@@ -42,7 +42,7 @@ def predecessorNode(t: Tree):
     if t == None:
         return t
     if t.left != None:  # Caso 1
-        return max(t.left)
+        return _max(t.left)
     else:  # Caso 2
         p = t.parent
         while p != None and t == p.left:
@@ -51,14 +51,14 @@ def predecessorNode(t: Tree):
         return p
 
 
-def min(T: Tree):
+def _min(T: Tree):
     u = T
     while u.left != None:
         u = u.left
     return u
 
 
-def max(T: Tree):
+def _max(T: Tree):
     u = T
     while u.right != None:
         u = u.right

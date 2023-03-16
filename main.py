@@ -20,6 +20,9 @@ def main():
     parser.add_argument("--no_math", "-N", action="store_true",
                         help="Use this flag if you want the program to ignore all potential math symbols."
                              "If --pdf is used it is strongly advised to use this flag")
+    parser.add_argument("--use_regex", action="store_false",
+                        help="Use this flag if you don't want the program to use conversions from regexes.json."
+                             "(Swap and copy function conversion is inside that file)")
     parser.add_argument("--pdf", action="store_true",
                         help="If used the input file should be a .pdf file. The program will read the pdf file and "
                              "extract all the functions it finds. At the moment it was only tested with past exams")
@@ -60,13 +63,12 @@ def main():
         out.write("import math\n")
         out.write("from utility.Classes import " + ", ".join(CLASSES) + "\n")
         for function_file in FUNCTIONS_FILES:
-            out.write(f"import known_functions.{function_file}\n")
+            out.write(f"import known_functions.{function_file} as {function_file}\n")
         out.write("import new_functions.useful_functions\n")
         out.write("from known_functions.trees import BLACK as BLACK\n")
         out.write("from known_functions.trees import RED as RED\n")
         for line in f:
             line = line.rstrip()
-            use_regex = False
             if not line:
                 continue
             if conversion_functions.is_function(line):
@@ -77,9 +79,7 @@ def main():
                 line = conversion_functions.var_declaration(line, args.no_math, args.skip_confirmation)
             elif "(" in line:
                 line = conversion_functions.isolated_function(line)
-            else:
-                use_regex = True
-            line = conversion_functions.remap(line, use_regex, args.skip_confirmation, args.no_math)
+            line = conversion_functions.remap(line, args.use_regex, args.skip_confirmation, args.no_math)
             out.write(line + "\n")
     print("File: ", args.o, "generated, you can now run it.")
 

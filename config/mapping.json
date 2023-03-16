@@ -7,17 +7,21 @@
     " ≥": ">=",
     "·": "*",
     "−": "-",
+    "€": "∈",
     "∈": "in",
     "foreach": "for",
+    "downto": "XUDK",
     " do": ":",
+    "XUDK": "downto",
     "nil": "None",
     "false": "False",
     "true": "True",
     "〈": "(",
     "〉": ")",
-    " % ": "#  ",
+    "% ": "# ",
     " mod ": "%",
     "boolean": "bool",
     "null": "None",
-    "delete": "del"
+    "delete": "del",
+    "`": "L"
   }
